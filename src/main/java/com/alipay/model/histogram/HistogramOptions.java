@@ -9,17 +9,18 @@ import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth
  */
 
 public class HistogramOptions {
-    private int   numBuckets;
-    private float firstBucketSize;
-    private float ratio;
-    private float epsilon;
+    private final int   numBuckets;
+    private final float firstBucketSize;
+    private final float ratio;
+    private final float epsilon;
 
     public HistogramOptions(float maxValue, float firstBucketSize, float ratio, float epsilon) {
         if (maxValue <= 0 || firstBucketSize <= 0f || ratio <= 1f || epsilon <= 0f) {
             throw new IllegalArgumentException("invalid histogram options");
         }
 
-        this.numBuckets = (int) (Math.ceil(logOverBase(ratio, maxValue * (ratio - 1) / firstBucketSize + 1)) + 1);
+        float a = logOverBase(ratio, maxValue * (ratio - 1) / firstBucketSize + 1);
+        this.numBuckets = (int) (Math.ceil(a) + 1);
         this.firstBucketSize = firstBucketSize;
         this.ratio = ratio;
         this.epsilon = epsilon;
@@ -40,7 +41,7 @@ public class HistogramOptions {
             throw new IllegalArgumentException("index " + bucket + " out of range [0," + numBuckets + "]");
         }
         if (bucket == 0) {return 0f;}
-        return (float) (firstBucketSize * (Math.pow(ratio, bucket - 1)) / (ratio - 1));
+        return (float) (firstBucketSize * (Math.pow(ratio, bucket) - 1) / (ratio - 1));
     }
 
     public int findBucket(float value) {
@@ -50,50 +51,34 @@ public class HistogramOptions {
         return bucket;
     }
 
-    // Returns the logarithm of x to given base, so that: base^log(base, x) == x.
+    // Returns the logarithm of x to given base,formula is log_y(x) = ln(x)/ln(y)
     protected float logOverBase(float base, float x) {
-        return (float) (Math.log(base) / Math.log(x));
+        return (float) (Math.log(x) / Math.log(base));
     }
 
     public int getNumBuckets() {
         return numBuckets;
     }
 
-    public void setNumBuckets(int numBuckets) {
-        this.numBuckets = numBuckets;
-    }
-
     public float getFirstBucketSize() {
         return firstBucketSize;
-    }
-
-    public void setFirstBucketSize(float firstBucketSize) {
-        this.firstBucketSize = firstBucketSize;
     }
 
     public float getRatio() {
         return ratio;
     }
 
-    public void setRatio(float ratio) {
-        this.ratio = ratio;
-    }
-
     public float getEpsilon() {
         return epsilon;
     }
 
-    public void setEpsilon(float epsilon) {
-        this.epsilon = epsilon;
-    }
-
     @Override
     public String toString() {
-        return "HistogramOptions{" +
-                "numBuckets=" + numBuckets +
-                ", firstBucketSize=" + firstBucketSize +
-                ", ratio=" + ratio +
-                ", epsilon=" + epsilon +
+        return "HistogramOptions{" + "\n"+
+                "numBuckets=" + numBuckets +",\n"+
+                "firstBucketSize=" + firstBucketSize +",\n"+
+                "ratio=" + ratio +",\n"+
+                "epsilon=" + epsilon +
                 '}';
     }
 }

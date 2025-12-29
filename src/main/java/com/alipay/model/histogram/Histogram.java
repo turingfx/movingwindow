@@ -1,5 +1,7 @@
 package com.alipay.model.histogram;
 
+import java.util.Arrays;
+
 public class Histogram {
     protected HistogramOptions options;
     protected float[]          bucketWeight;
@@ -11,7 +13,7 @@ public class Histogram {
         this.options = options;
         this.bucketWeight = new float[options.getNumBuckets()];
         this.totalWeight = 0f;
-        this.minBucket = options.getNumBuckets() -1;
+        this.minBucket = options.getNumBuckets() - 1;
         this.maxBucket = 0;
     }
 
@@ -38,6 +40,7 @@ public class Histogram {
             throw new IllegalArgumentException("Weight must be non-positive");
         }
         int bucket = options.findBucket(value);
+        bucketWeight[bucket] += weight;
         totalWeight += weight;
         if (bucket < minBucket && bucketWeight[bucket] >= options.getEpsilon()) {
             minBucket = bucket;
@@ -113,7 +116,7 @@ public class Histogram {
             if (bucket < options.getNumBuckets() - 1) {
                 startBucket += 1;
             }
-            sum += bucketWeight[bucket] + options.getBucketStart(startBucket);
+            sum += bucketWeight[bucket] * options.getBucketStart(startBucket);
         }
         return sum / totalWeight;
     }
@@ -124,6 +127,18 @@ public class Histogram {
             return options.getBucketStart(maxBucket + 1);
         }
         return options.getBucketStart(maxBucket);
+    }
+
+    public float maxBucketWeight() {
+        float maxBucketWeight = 0;
+        for (int bucket = minBucket; bucket <= maxBucketWeight; bucket++) {
+            if (maxBucketWeight == 0) {
+                maxBucket += bucketWeight[bucket];
+            } else if (maxBucketWeight < bucketWeight[bucket]) {
+                maxBucketWeight = bucketWeight[bucket];
+            }
+        }
+        return maxBucketWeight;
     }
 
     public boolean isEmpty() {
@@ -143,11 +158,11 @@ public class Histogram {
         }
     }
 
-    public float agg(HistogramAggPolicy policy){
-        if (policy == null){
+    public float agg(HistogramAggPolicy policy) {
+        if (policy == null) {
             throw new IllegalArgumentException("no policy found in agg policy");
         }
-        switch (policy.type){
+        switch (policy.type) {
             case MAX -> {return max();}
             case AVERAGE -> {return average();}
             case Percentile -> {return percentile(policy.percentile);}
@@ -161,22 +176,22 @@ public class Histogram {
             return false;
         }
 
-        if (options != other.options || minBucket != other.minBucket || maxBucket != other.maxBucket) return false;
-        for (int bucket = minBucket; bucket <= maxBucket; bucket++){
+        if (options != other.options || minBucket != other.minBucket || maxBucket != other.maxBucket) {return false;}
+        for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
             float diff = bucketWeight[bucket] - other.bucketWeight[bucket];
-            if (diff > 1e-15 || diff < -1e-15) return false;
+            if (diff > 1e-15 || diff < -1e-15) {return false;}
         }
         return true;
     }
 
     @Override
     public String toString() {
-        return "Histogram{" +
-                "option=" + options.toString() +
-                "bucketWeight=" + bucketWeight +
-                "totalWeight=" + totalWeight +
-                "minBucket=" + minBucket +
-                ", minBucket=" + maxBucket +
+        return "Histogram{" + "\n" +
+                "option=" + options.toString() + ",\n" +
+                "bucketWeight=" + Arrays.toString(bucketWeight) + ",\n" +
+                "totalWeight=" + totalWeight + ",\n" +
+                "minBucket=" + minBucket + ",\n" +
+                "minBucket=" + maxBucket +
                 '}';
     }
 }

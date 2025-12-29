@@ -66,18 +66,6 @@ public class DecayingHistogram extends Histogram {
         return maxBucketWeight / totalWeight < percentile;
     }
 
-    public float maxBucketWeight() {
-        float maxWeight = 0f;
-        for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
-            if (maxWeight == 0) {
-                maxWeight = bucketWeight[bucket];
-            } else if (maxWeight < bucketWeight[bucket]) {
-                maxWeight = bucketWeight[bucket];
-            }
-        }
-        return maxWeight;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof DecayingHistogram other)) {
@@ -88,10 +76,10 @@ public class DecayingHistogram extends Histogram {
 
     @Override
     public String toString() {
-        return "DecayingHistogram{" +
-                "super=" + super.toString() +
-                "halfLife=" + halfLife +
-                ", referenceTime=" + referenceTime +
+        return "DecayingHistogram{" +"\n"+
+                "super=" + super.toString() +",\n"+
+                "halfLife=" + halfLife +",\n"+
+                "referenceTime=" + referenceTime +
                 '}';
     }
 
