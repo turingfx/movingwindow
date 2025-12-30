@@ -2,46 +2,50 @@ package com.alipay.model.histogram;
 
 import java.util.Arrays;
 
+import static com.alipay.utils.DoubleUtil.round;
+
 public class Histogram {
     protected HistogramOptions options;
-    protected float[]          bucketWeight;
-    protected float            totalWeight;
+    protected double[]          bucketWeight;
+    protected double            totalWeight;
     protected int              minBucket;
     protected int              maxBucket;
 
     public Histogram(HistogramOptions options) {
         this.options = options;
-        this.bucketWeight = new float[options.getNumBuckets()];
+        this.bucketWeight = new double[options.getNumBuckets()];
         this.totalWeight = 0f;
         this.minBucket = options.getNumBuckets() - 1;
         this.maxBucket = 0;
     }
 
-    public void scala(float factor) {
+    public void scala(double factor) {
         if (factor < 0) {
             throw new RuntimeException("scale factor must be non-negative");
         }
         for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
-            bucketWeight[bucket] *= factor;
+            bucketWeight[bucket] = round(bucketWeight[bucket] * factor);
         }
 
-        totalWeight *= factor;
+        totalWeight = round(totalWeight * factor);
         updateMinAndMaxBucket();
     }
 
-    public boolean clusterAtTheExtremes(float tolerantPercentage) {
+    public boolean clusterAtTheExtremes(double tolerantPercentage) {
         if (bucketWeight[0] / totalWeight >= tolerantPercentage) {return true;} else if (
-                bucketWeight[bucketWeight.length - 1] / tolerantPercentage >= tolerantPercentage) {return true;}
+                bucketWeight[bucketWeight.length - 1] / totalWeight >= tolerantPercentage) {return true;}
         return false;
     }
 
-    public void addSample(float value, float weight, Long time) {
-        if (weight < 0f) {
+    public void addSample(double value, double weight, Long time) {
+        if (weight < 0) {
             throw new IllegalArgumentException("Weight must be non-positive");
         }
         int bucket = options.findBucket(value);
         bucketWeight[bucket] += weight;
+        bucketWeight[bucket] = round(bucketWeight[bucket]);
         totalWeight += weight;
+        totalWeight = round(totalWeight);
         if (bucket < minBucket && bucketWeight[bucket] >= options.getEpsilon()) {
             minBucket = bucket;
         }
@@ -50,13 +54,13 @@ public class Histogram {
         }
     }
 
-    public void subtractSample(float value, float weight, Long time) {
-        if (weight < 0f) {
+    public void subtractSample(double value, double weight, Long time) {
+        if (weight < 0) {
             throw new IllegalArgumentException("Weight must be non-positive");
         }
 
         int bucket = options.findBucket(value);
-        float epsilon = options.getEpsilon();
+        double epsilon = options.getEpsilon();
 
         totalWeight = safeSubtract(totalWeight, weight, epsilon);
         bucketWeight[bucket] = safeSubtract(bucketWeight[bucket], weight, epsilon);
@@ -64,7 +68,7 @@ public class Histogram {
         updateMinAndMaxBucket();
     }
 
-    private float safeSubtract(float value, float sub, float epsilon) {
+    private double safeSubtract(double value, double sub, double epsilon) {
         value -= sub;
         if (value < epsilon) {
             return 0;
@@ -79,8 +83,10 @@ public class Histogram {
         }
         for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
             bucketWeight[bucket] += o.bucketWeight[bucket];
+            bucketWeight[bucket] = round(bucketWeight[bucket]);
         }
-        totalWeight += o.totalWeight;
+        totalWeight += round(o.totalWeight);
+        totalWeight = round(totalWeight);
         if (o.minBucket < minBucket) {
             minBucket = o.minBucket;
         }
@@ -89,56 +95,60 @@ public class Histogram {
         }
     }
 
-    public float percentile(float percentile) {
-        if (isEmpty()) {return 0f;}
-        float partialSum = 0f;
-        float threshold = percentile * totalWeight;
+    public double percentile(double percentile) {
+        if (isEmpty()) {return 0;}
+        double partialSum = 0;
+        double threshold = round(percentile * totalWeight);
         int bucket = minBucket;
-        for (; bucket <= maxBucket; bucket++) {
+        for (; bucket < maxBucket; bucket++) {
             partialSum += bucketWeight[bucket];
+            partialSum = round(partialSum);
             if (partialSum >= threshold) {
                 break;
             }
         }
 
-        if (bucket < options.getNumBuckets() - 1) {return options.getBucketStart(bucket + 1);}
+        if (bucket < options.getNumBuckets() - 1) {
+            return options.getBucketStart(bucket + 1);
+        }
         // Return the start of the last bucket (note that the last bucket
         // doesn't have an upper bound).
         return options.getBucketStart(bucket);
     }
 
-    public float average() {
-        if (isEmpty()) {return 0f;}
-        float sum = 0;
+    public double average() {
+        if (isEmpty()) {return 0;}
+        double sum = 0;
         int bucket = minBucket;
         for (; bucket <= maxBucket; bucket++) {
             int startBucket = bucket;
             if (bucket < options.getNumBuckets() - 1) {
                 startBucket += 1;
             }
-            sum += bucketWeight[bucket] * options.getBucketStart(startBucket);
+            double bucketLeftValue = options.getBucketStart(startBucket);
+            sum += bucketWeight[bucket] * bucketLeftValue;
         }
-        return sum / totalWeight;
+        return round(sum) / round(totalWeight);
     }
 
-    public float max() {
-        if (isEmpty()) {return 0f;}
+    public double max() {
+        if (isEmpty()) {return 0;}
         if (maxBucket < options.getNumBuckets() - 1) {
             return options.getBucketStart(maxBucket + 1);
         }
         return options.getBucketStart(maxBucket);
     }
 
-    public float maxBucketWeight() {
-        float maxBucketWeight = 0;
-        for (int bucket = minBucket; bucket <= maxBucketWeight; bucket++) {
+    public double maxBucketWeight() {
+        double maxBucketWeight = 0;
+        for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
             if (maxBucketWeight == 0) {
-                maxBucket += bucketWeight[bucket];
+                maxBucketWeight += bucketWeight[bucket];
             } else if (maxBucketWeight < bucketWeight[bucket]) {
                 maxBucketWeight = bucketWeight[bucket];
             }
         }
-        return maxBucketWeight;
+        return round(maxBucketWeight);
     }
 
     public boolean isEmpty() {
@@ -148,7 +158,7 @@ public class Histogram {
     // Adjusts the value of MinBucket and MaxBucket after any operation that
     // decreases weights.
     private void updateMinAndMaxBucket() {
-        float epsilon = options.getEpsilon();
+        double epsilon = options.getEpsilon();
         int lastBucket = options.getNumBuckets() - 1;
         while (bucketWeight[minBucket] < epsilon && minBucket < lastBucket) {
             minBucket++;
@@ -158,7 +168,7 @@ public class Histogram {
         }
     }
 
-    public float agg(HistogramAggPolicy policy) {
+    public double agg(HistogramAggPolicy policy) {
         if (policy == null) {
             throw new IllegalArgumentException("no policy found in agg policy");
         }
@@ -178,7 +188,7 @@ public class Histogram {
 
         if (options != other.options || minBucket != other.minBucket || maxBucket != other.maxBucket) {return false;}
         for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
-            float diff = bucketWeight[bucket] - other.bucketWeight[bucket];
+            double diff = bucketWeight[bucket] - other.bucketWeight[bucket];
             if (diff > 1e-15 || diff < -1e-15) {return false;}
         }
         return true;

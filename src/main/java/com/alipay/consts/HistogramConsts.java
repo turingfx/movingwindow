@@ -1,5 +1,6 @@
 package com.alipay.consts;
 
+import java.text.DecimalFormat;
 import java.time.Duration;
 
 /**
@@ -30,5 +31,4 @@ public class HistogramConsts {
     // DefaultCPUHistogramDecayHalfLife is the default value for CPUHistogramDecayHalfLife.
     // CPU usage sample to lose half of its weight.
     public static final Duration defaultCPUHistogramDecayHalfLife      = Duration.ofHours(24);
-
 }

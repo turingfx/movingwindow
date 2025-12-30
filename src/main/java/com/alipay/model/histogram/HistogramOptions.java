@@ -1,7 +1,10 @@
 package com.alipay.model.histogram;
 
+import com.alipay.utils.DoubleUtil;
+
 import static com.alipay.consts.HistogramConsts.defaultEpsilon;
 import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
+import static com.alipay.utils.DoubleUtil.round;
 
 /**
  * @author sansi.xy
@@ -9,17 +12,17 @@ import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth
  */
 
 public class HistogramOptions {
-    private final int   numBuckets;
-    private final float firstBucketSize;
-    private final float ratio;
-    private final float epsilon;
+    private final int    numBuckets;
+    private final double firstBucketSize;
+    private final double ratio;
+    private final double epsilon;
 
-    public HistogramOptions(float maxValue, float firstBucketSize, float ratio, float epsilon) {
-        if (maxValue <= 0 || firstBucketSize <= 0f || ratio <= 1f || epsilon <= 0f) {
+    public HistogramOptions(double maxValue, double firstBucketSize, double ratio, double epsilon) {
+        if (maxValue <= 0 || firstBucketSize <= 0 || ratio <= 1 || epsilon <= 0) {
             throw new IllegalArgumentException("invalid histogram options");
         }
 
-        float a = logOverBase(ratio, maxValue * (ratio - 1) / firstBucketSize + 1);
+        double a = logOverBase(ratio, maxValue * (ratio - 1) / firstBucketSize + 1);
         this.numBuckets = (int) (Math.ceil(a) + 1);
         this.firstBucketSize = firstBucketSize;
         this.ratio = ratio;
@@ -28,23 +31,23 @@ public class HistogramOptions {
 
     public HistogramOptions getCpuHistogramOptions() {
         // ceil is cu,cpu range is 0.01 ~ 1000
-        return new HistogramOptions(1000, 0.01f, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
+        return new HistogramOptions(1000, 0.01, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
     }
 
     public HistogramOptions getMemHistogramOptions() {
         // ceil is B,mem range is 10MB ~ 1TB
-        return new HistogramOptions(1e12f, 1e7f, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
+        return new HistogramOptions(1e12, 1e7, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
     }
 
-    public float getBucketStart(int bucket) {
+    public double getBucketStart(int bucket) {
         if (bucket < 0 || bucket >= numBuckets) {
             throw new IllegalArgumentException("index " + bucket + " out of range [0," + numBuckets + "]");
         }
-        if (bucket == 0) {return 0f;}
-        return (float) (firstBucketSize * (Math.pow(ratio, bucket) - 1) / (ratio - 1));
+        if (bucket == 0) {return 0;}
+        return round(firstBucketSize * (Math.pow(ratio, bucket) - 1) / (ratio - 1));
     }
 
-    public int findBucket(float value) {
+    public int findBucket(double value) {
         if (value < firstBucketSize) {return 0;}
         int bucket = (int) logOverBase(ratio, value * (ratio - 1) / firstBucketSize + 1);
         if (bucket >= numBuckets) {return numBuckets - 1;}
@@ -52,32 +55,32 @@ public class HistogramOptions {
     }
 
     // Returns the logarithm of x to given base,formula is log_y(x) = ln(x)/ln(y)
-    protected float logOverBase(float base, float x) {
-        return (float) (Math.log(x) / Math.log(base));
+    protected double logOverBase(double base, double x) {
+        return DoubleUtil.divide(Math.log(x), Math.log(base));
     }
 
     public int getNumBuckets() {
         return numBuckets;
     }
 
-    public float getFirstBucketSize() {
+    public double getFirstBucketSize() {
         return firstBucketSize;
     }
 
-    public float getRatio() {
+    public double getRatio() {
         return ratio;
     }
 
-    public float getEpsilon() {
+    public double getEpsilon() {
         return epsilon;
     }
 
     @Override
     public String toString() {
-        return "HistogramOptions{" + "\n"+
-                "numBuckets=" + numBuckets +",\n"+
-                "firstBucketSize=" + firstBucketSize +",\n"+
-                "ratio=" + ratio +",\n"+
+        return "HistogramOptions{" + "\n" +
+                "numBuckets=" + numBuckets + ",\n" +
+                "firstBucketSize=" + firstBucketSize + ",\n" +
+                "ratio=" + ratio + ",\n" +
                 "epsilon=" + epsilon +
                 '}';
     }

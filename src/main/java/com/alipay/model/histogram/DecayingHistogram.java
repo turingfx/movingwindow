@@ -15,19 +15,19 @@ public class DecayingHistogram extends Histogram {
     private Long halfLife;
     private Long referenceTime;
 
-    public DecayingHistogram(HistogramOptions options,Long halfLife, Long referenceTime) {
+    public DecayingHistogram(HistogramOptions options,Long halfLife) {
         super(options);
         this.halfLife = halfLife;
-        this.referenceTime = referenceTime;
+        this.referenceTime = 0L;
     }
 
     @Override
-    public void addSample(float value, float weight, Long time) {
+    public void addSample(double value, double weight, Long time) {
         super.addSample(value,weight * decayFactor(time), time);
     }
 
     @Override
-    public void subtractSample(float value, float weight, Long time) {
+    public void subtractSample(double value, double weight, Long time) {
         super.subtractSample(value, weight * decayFactor(time), time);
     }
 
@@ -44,25 +44,25 @@ public class DecayingHistogram extends Histogram {
     }
 
 
-    public float decayFactor(Long timestamp) {
+    public double decayFactor(Long timestamp) {
         // Max timestamp before the exponent grows too large.
         long maxAllowedTimestamp = referenceTime + halfLife * maxDecayExponent;
         if (timestamp > maxAllowedTimestamp) {
             shiftReferenceTimestamp(timestamp);
         }
-        return (float) Math.pow(2, (double) (timestamp - referenceTime) / halfLife);
+        return Math.pow(2, (double) (timestamp - referenceTime) / halfLife);
     }
 
     private void shiftReferenceTimestamp(Long newReferenceTimestamp) {
         // Make sure the decay start is an integer multiple of HalfLife.
-        newReferenceTimestamp = Math.round((float) newReferenceTimestamp / halfLife) * halfLife;
-        int exponent = Math.round((float) (referenceTime - newReferenceTimestamp) / halfLife);
-        scala(Math.scalb(1f, exponent)); // Scale all weights by 2^exponent.
+        newReferenceTimestamp = Math.round((double) newReferenceTimestamp / halfLife) * halfLife;
+        int exponent = (int) Math.round((double) (referenceTime - newReferenceTimestamp) / halfLife);
+        scala(Math.scalb(1, exponent)); // Scale all weights by 2^exponent.
         referenceTime = newReferenceTimestamp;
     }
 
-    public boolean isVaryDramatic(float percentile) {
-        float maxBucketWeight = maxBucketWeight();
+    public boolean isVaryDramatic(double percentile) {
+        double maxBucketWeight = maxBucketWeight();
         return maxBucketWeight / totalWeight < percentile;
     }
 
