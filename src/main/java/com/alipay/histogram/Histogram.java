@@ -1,4 +1,4 @@
-package com.alipay.model.histogram;
+package com.alipay.histogram;
 
 import java.util.Arrays;
 

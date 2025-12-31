@@ -1,4 +1,4 @@
-package com.alipay.model.histogram;
+package com.alipay.histogram;
 
 /**
  * @author sansi.xy

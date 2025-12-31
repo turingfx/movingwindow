@@ -1,4 +1,4 @@
-package com.alipay.model.histogram;
+package com.alipay.histogram;
 
 import java.util.Objects;
 
@@ -18,7 +18,13 @@ public class DecayingHistogram extends Histogram {
     public DecayingHistogram(HistogramOptions options,Long halfLife) {
         super(options);
         this.halfLife = halfLife;
-        this.referenceTime = 0L;
+        this.referenceTime = System.currentTimeMillis();
+    }
+
+    public DecayingHistogram(HistogramOptions options,Long halfLife,Long ts) {
+        super(options);
+        this.halfLife = halfLife;
+        this.referenceTime = ts;
     }
 
     @Override

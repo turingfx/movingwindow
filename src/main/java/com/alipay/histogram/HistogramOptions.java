@@ -1,4 +1,4 @@
-package com.alipay.model.histogram;
+package com.alipay.histogram;
 
 import com.alipay.utils.DoubleUtil;
 
@@ -29,12 +29,12 @@ public class HistogramOptions {
         this.epsilon = epsilon;
     }
 
-    public HistogramOptions getCpuHistogramOptions() {
+    public static HistogramOptions getCpuHistogramOptions() {
         // ceil is cu,cpu range is 0.01 ~ 1000
         return new HistogramOptions(1000, 0.01, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
     }
 
-    public HistogramOptions getMemHistogramOptions() {
+    public static HistogramOptions getMemHistogramOptions() {
         // ceil is B,mem range is 10MB ~ 1TB
         return new HistogramOptions(1e12, 1e7, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
     }

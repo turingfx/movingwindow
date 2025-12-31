@@ -39,6 +39,12 @@
             <version>2.28.2</version> <!--  或者其他2.x版本 -->
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
     </dependencies>
 
 </project>
