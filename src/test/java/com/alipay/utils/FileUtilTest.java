@@ -94,7 +94,7 @@ public class FileUtilTest {
         FileUtil.readFileWithBufferedReader(TEST_FILE, line -> {
             assertEquals(lines.get(lineCount[0]), line);
             lineCount[0]++;
-        });
+        },true);
         
         assertEquals("读取的行数应该与文件行数相同", lines.size(), lineCount[0]);
     }

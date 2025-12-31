@@ -128,7 +128,7 @@ public class Histogram {
             double bucketLeftValue = options.getBucketStart(startBucket);
             sum += bucketWeight[bucket] * bucketLeftValue;
         }
-        return round(sum) / round(totalWeight);
+        return round(sum/totalWeight);
     }
 
     public double max() {

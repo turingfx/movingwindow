@@ -22,11 +22,13 @@ public class CpuMockHistogramTest {
 
     @Test
     public void testWithCpuHistogram() throws Exception {
+        // exp variable
         String filePath = "data/cpumock2.csv";
-        String outputPath = "data/cpumock2_mw.csv";
+        String outputPath = "data/cpumock2_mw_2.csv";
+        long millis = Duration.ofHours(6).toMillis();
 
         HistogramOptions cpuHistogramOptions = HistogramOptions.getCpuHistogramOptions();
-        DecayingHistogram decayingHistogram = new DecayingHistogram(cpuHistogramOptions, Duration.ofHours(1).toMillis(),
+        DecayingHistogram decayingHistogram = new DecayingHistogram(cpuHistogramOptions, millis,
                 TimestampUtil.stringToTimestampMs("2025-12-30 01:00:00"));
 
         List<BaseMetric> metricsList = new ArrayList<>();
@@ -36,7 +38,7 @@ public class CpuMockHistogramTest {
             Double value = Double.parseDouble(split[1].trim());
             BaseMetric point = new BaseMetric("cpu_util", ts, value);
             metricsList.add(point);
-        });
+        },true);
 
         List<String> outputList = new ArrayList<>();
         for (BaseMetric baseMetric : metricsList) {
