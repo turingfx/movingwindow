@@ -25,8 +25,8 @@ public class CpuMockHistogramTest {
     public void testWithCpuHistogram() throws Exception {
         // exp variable
         String filePath = "showdata/cpumock2.csv";
-        String outputPath = "showdata/cpumock2_mw_2.csv";
-        long millis = Duration.ofHours(6).toMillis();
+        String outputPath = "showdata/cpumock2_mw_5.csv";
+        long millis = Duration.ofMinutes(30).toMillis();
 
         HistogramOptions cpuHistogramOptions = HistogramOptions.getCpuHistogramOptions();
         DecayingHistogram decayingHistogram = new DecayingHistogram(cpuHistogramOptions, millis,
