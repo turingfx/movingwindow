@@ -1,25 +1,18 @@
 package com.alipay.model.histogram;
 
-import com.alipay.histogram.DecayingHistogram;
-import com.alipay.histogram.Histogram;
-import com.alipay.histogram.HistogramAggPolicy;
-import com.alipay.histogram.HistogramAggType;
-import com.alipay.histogram.HistogramOptions;
-import com.alipay.metrics.BaseMetric;
+import com.alipay.model.metrics.BaseMetric;
 import com.alipay.utils.AlgorithmUtil;
 import com.alipay.utils.FileUtil;
 import com.alipay.utils.TimestampUtil;
 import org.junit.Test;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.alipay.consts.HistogramConsts.defaultEpsilon;
-import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
+import static com.alipay.model.consts.HistogramConsts.defaultEpsilon;
+import static com.alipay.model.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
 
 /**
  * Mock with Cpu util data

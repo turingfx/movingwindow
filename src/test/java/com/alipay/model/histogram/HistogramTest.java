@@ -1,7 +1,5 @@
 package com.alipay.model.histogram;
 
-import com.alipay.histogram.Histogram;
-import com.alipay.histogram.HistogramOptions;
 import org.junit.Test;
 
 import static com.alipay.utils.DoubleUtil.round;
