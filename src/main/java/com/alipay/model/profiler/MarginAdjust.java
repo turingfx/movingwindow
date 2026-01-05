@@ -1,4 +1,4 @@
-package com.alipay.conf;
+package com.alipay.model.profiler;
 
 /**
  * @author sansi.xy
