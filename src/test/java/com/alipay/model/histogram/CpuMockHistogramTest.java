@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,8 +24,8 @@ public class CpuMockHistogramTest {
     @Test
     public void testWithCpuHistogram() throws Exception {
         // exp variable
-        String filePath = "data/cpumock2.csv";
-        String outputPath = "data/cpumock2_mw_2.csv";
+        String filePath = "showdata/cpumock2.csv";
+        String outputPath = "showdata/cpumock2_mw_2.csv";
         long millis = Duration.ofHours(6).toMillis();
 
         HistogramOptions cpuHistogramOptions = HistogramOptions.getCpuHistogramOptions();
@@ -38,9 +39,11 @@ public class CpuMockHistogramTest {
             Double value = Double.parseDouble(split[1].trim());
             BaseMetric point = new BaseMetric("cpu_util", ts, value);
             metricsList.add(point);
-        },true);
+        }, true);
 
-        List<String> outputList = new ArrayList<>();
+        LinkedList<String> outputList = new LinkedList<>();
+        outputList.addFirst("time,cpu_util");
+
         for (BaseMetric baseMetric : metricsList) {
             decayingHistogram.addSample(baseMetric.getValue(), 1, baseMetric.getTimestamp());
             String str = TimestampUtil.timestampMsToString(baseMetric.getTimestamp());
@@ -48,6 +51,7 @@ public class CpuMockHistogramTest {
                     + ","
                     + decayingHistogram.average()
             );
+
             FileUtil.writeFileFromList(outputPath, outputList);
         }
     }
