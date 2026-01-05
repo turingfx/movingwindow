@@ -34,7 +34,7 @@ public class CpuMockHistogramNodecayTest {
         String outputPath = "showdata2/cpumock2_mw_5.csv";
         long millis = Duration.ofMinutes(60).toMillis();
         int sampleWindow = 12;
-        HistogramAggType type = HistogramAggType.Percentile;
+        HistogramAggType type = HistogramAggType.AVERAGE;
 
         HistogramOptions cpuHistogramOptions = new HistogramOptions(14000, 1, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
         Histogram histogram = new Histogram(cpuHistogramOptions);
