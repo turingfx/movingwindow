@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.alipay.consts.HistogramConsts.defaultEpsilon;
+import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
+
 /**
  * Mock with Cpu util data
  *
@@ -26,11 +29,11 @@ public class CpuMockHistogramTest {
         // exp variable
         String filePath = "showdata2/cpumock2.csv";
         String outputPath = "showdata2/cpumock2_mw_3.csv";
-        long millis = Duration.ofHours(24).toMillis();
+        long millis = Duration.ofHours(12).toMillis();
 
-        HistogramOptions cpuHistogramOptions = HistogramOptions.getCpuHistogramOptions();
+        HistogramOptions cpuHistogramOptions = new HistogramOptions(14000, 1, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
         DecayingHistogram decayingHistogram = new DecayingHistogram(cpuHistogramOptions, millis,
-                TimestampUtil.stringToTimestampMs("2025-12-30 01:00:00"));
+                TimestampUtil.stringToTimestampMs("2025-12-29 11:10:00"));
 
         List<BaseMetric> metricsList = new ArrayList<>();
         FileUtil.readFileWithBufferedReader(filePath, line -> {
