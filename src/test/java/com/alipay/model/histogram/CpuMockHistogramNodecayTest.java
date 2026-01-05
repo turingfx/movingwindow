@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.alipay.model.consts.HistogramConsts.defaultEpsilon;
-import static com.alipay.model.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
+import static com.alipay.consts.HistogramConsts.defaultEpsilon;
+import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
 
 /**
  * Mock with Cpu util data

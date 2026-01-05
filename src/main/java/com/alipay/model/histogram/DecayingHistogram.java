@@ -1,6 +1,6 @@
 package com.alipay.model.histogram;
 
-import static com.alipay.model.consts.HistogramConsts.maxDecayExponent;
+import static com.alipay.consts.HistogramConsts.maxDecayExponent;
 
 import java.util.Objects;
 

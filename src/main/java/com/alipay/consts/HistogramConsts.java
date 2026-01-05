@@ -1,4 +1,4 @@
-package com.alipay.model.consts;
+package com.alipay.consts;
 
 import java.time.Duration;
 

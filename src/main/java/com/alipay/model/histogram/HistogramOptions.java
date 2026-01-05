@@ -1,7 +1,7 @@
 package com.alipay.model.histogram;
 
-import static com.alipay.model.consts.HistogramConsts.defaultEpsilon;
-import static com.alipay.model.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
+import static com.alipay.consts.HistogramConsts.defaultEpsilon;
+import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
 import static com.alipay.utils.DoubleUtil.round;
 
 import com.alipay.utils.DoubleUtil;
