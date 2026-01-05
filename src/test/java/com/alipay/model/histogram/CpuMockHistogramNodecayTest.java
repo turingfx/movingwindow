@@ -1,6 +1,7 @@
 package com.alipay.model.histogram;
 
 import com.alipay.histogram.DecayingHistogram;
+import com.alipay.histogram.Histogram;
 import com.alipay.histogram.HistogramAggPolicy;
 import com.alipay.histogram.HistogramAggType;
 import com.alipay.histogram.HistogramOptions;
@@ -24,20 +25,19 @@ import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth
  * @date 12/31/25
  */
 
-public class CpuMockHistogram2Test {
+public class CpuMockHistogramNodecayTest {
 
     @Test
     public void testWithCpuHistogram() throws Exception {
         // exp variable
         String filePath = "showdata2/cpumock2.csv";
-        String outputPath = "showdata2/cpumock2_mw_4.csv";
+        String outputPath = "showdata2/cpumock2_mw_5.csv";
         long millis = Duration.ofMinutes(60).toMillis();
         int sampleWindow = 12;
         HistogramAggType type = HistogramAggType.Percentile;
 
         HistogramOptions cpuHistogramOptions = new HistogramOptions(14000, 1, 1 + defaultHistogramBucketSizeGrowth, defaultEpsilon);
-        DecayingHistogram decayingHistogram = new DecayingHistogram(cpuHistogramOptions, millis,
-                TimestampUtil.stringToTimestampMs("2025-12-29 11:10:00"));
+        Histogram histogram = new Histogram(cpuHistogramOptions);
 
         List<BaseMetric> metricsList = new ArrayList<>();
         FileUtil.readFileWithBufferedReader(filePath, line -> {
@@ -55,11 +55,11 @@ public class CpuMockHistogram2Test {
         for (BaseMetric baseMetric : metricsList) {
             lineNum++;
             if (lineNum % sampleWindow == 0) {
-                decayingHistogram.addSample(baseMetric.getValue(), 1, baseMetric.getTimestamp());
+                histogram.addSample(baseMetric.getValue(), 1, baseMetric.getTimestamp());
                 String str = TimestampUtil.timestampMsToString(baseMetric.getTimestamp());
                 outputList.add(str
                         + ","
-                        + decayingHistogram.agg(new HistogramAggPolicy(type, 0.95))
+                        + histogram.agg(new HistogramAggPolicy(type, 0.95))
                 );
             }
         }

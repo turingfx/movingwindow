@@ -7,5 +7,10 @@ package com.alipay.histogram;
 
 public class HistogramAggPolicy {
     HistogramAggType type;
-    float percentile;
+    double percentile;
+
+    public HistogramAggPolicy(HistogramAggType type, double percentile) {
+        this.type = type;
+        this.percentile = percentile;
+    }
 }
