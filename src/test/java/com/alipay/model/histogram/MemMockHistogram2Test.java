@@ -22,11 +22,13 @@ import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth
 
 public class MemMockHistogram2Test {
 
+    public static final double PERCENTILE = 0.6;
+
     @Test
     public void testWithMemHistogram() throws Exception {
         // exp variable
         String filePath = "showdata2/memmock.csv";
-        String outputPath = "showdata2/memmock_mw_12h.csv";
+        String outputPath = "showdata2/memmock_mw_12h_2.csv";
         long millis = Duration.ofHours(12).toMillis();
         int sampleWindow = 12;
         HistogramAggType type = HistogramAggType.Percentile;
@@ -53,7 +55,7 @@ public class MemMockHistogram2Test {
             if (lineNum % sampleWindow == 0) {
                 decayingHistogram.addSample(baseMetric.getValue(), 1, baseMetric.getTimestamp());
                 String str = TimestampUtil.timestampMsToString(baseMetric.getTimestamp());
-                double profileMem = decayingHistogram.agg(new HistogramAggPolicy(type, 0.95)) * 1024 * 1024;
+                double profileMem = decayingHistogram.agg(new HistogramAggPolicy(type, PERCENTILE)) * 1024 * 1024;
                 outputList.add(str
                         + ","
                         + profileMem);
