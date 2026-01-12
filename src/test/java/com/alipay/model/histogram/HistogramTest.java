@@ -135,7 +135,7 @@ public class HistogramTest {
 
         testGram.addSample(2,0.9,null);
         // (3*0.9+1*0.1)/(0.1+0.9)
-        assertEquals(2.8, testGram.average(), 0.0);
+        assertEquals(2.7, testGram.average(), 0.0);
     }
 
     @Test

@@ -46,14 +46,15 @@ public class HistogramOptions {
     if (bucket == 0) {
       return 0;
     }
-    return round(firstBucketSize * (Math.pow(ratio, bucket) - 1) / (ratio - 1));
+    double multiply = DoubleUtil.multiply(firstBucketSize, (Math.pow(ratio, bucket) - 1));
+    return DoubleUtil.divide(multiply, ratio - 1);
   }
 
   public int findBucket(double value) {
     if (value < firstBucketSize) {
       return 0;
     }
-    int bucket = (int) logOverBase(ratio, value * (ratio - 1) / firstBucketSize + 1);
+    int bucket = (int) logOverBase(ratio, DoubleUtil.divide(DoubleUtil.multiply(value ,(ratio - 1)) ,firstBucketSize )+ 1);
     if (bucket >= numBuckets) {
       return numBuckets - 1;
     }

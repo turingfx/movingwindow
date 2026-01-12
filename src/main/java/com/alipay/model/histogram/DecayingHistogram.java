@@ -1,6 +1,9 @@
 package com.alipay.model.histogram;
 
+import com.alipay.utils.DoubleUtil;
+
 import static com.alipay.consts.HistogramConsts.maxDecayExponent;
+import static com.alipay.utils.DoubleUtil.multiply;
 
 import java.util.Objects;
 
@@ -17,7 +20,7 @@ public class DecayingHistogram extends Histogram {
   public DecayingHistogram(HistogramOptions options, Long halfLife) {
     super(options);
     this.halfLife = halfLife;
-    this.referenceTime = System.currentTimeMillis();
+    this.referenceTime = 0L;
   }
 
   public DecayingHistogram(HistogramOptions options, Long halfLife, Long ts) {
@@ -28,12 +31,12 @@ public class DecayingHistogram extends Histogram {
 
   @Override
   public void addSample(double value, double weight, Long time) {
-    super.addSample(value, weight * decayFactor(time), time);
+    super.addSample(value, multiply(weight,decayFactor(time)), time);
   }
 
   @Override
   public void subtractSample(double value, double weight, Long time) {
-    super.subtractSample(value, weight * decayFactor(time), time);
+    super.subtractSample(value, multiply(weight,decayFactor(time)), time);
   }
 
   public void merge(DecayingHistogram o) {
@@ -67,7 +70,7 @@ public class DecayingHistogram extends Histogram {
 
   public boolean isVaryDramatic(double percentile) {
     double maxBucketWeight = maxBucketWeight();
-    return maxBucketWeight / totalWeight < percentile;
+    return DoubleUtil.divide(maxBucketWeight,totalWeight) < percentile;
   }
 
   @Override

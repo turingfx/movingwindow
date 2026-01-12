@@ -1,5 +1,7 @@
 package com.alipay.model.histogram;
 
+import com.alipay.utils.DoubleUtil;
+
 import static com.alipay.utils.DoubleUtil.round;
 
 import java.util.Arrays;
@@ -24,17 +26,17 @@ public class Histogram {
       throw new RuntimeException("scale factor must be non-negative");
     }
     for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
-      bucketWeight[bucket] = round(bucketWeight[bucket] * factor);
+      bucketWeight[bucket] = DoubleUtil.multiply(bucketWeight[bucket],factor);
     }
 
-    totalWeight = round(totalWeight * factor);
+    totalWeight = DoubleUtil.multiply(totalWeight ,factor);
     updateMinAndMaxBucket();
   }
 
   public boolean clusterAtTheExtremes(double tolerantPercentage) {
-    if (bucketWeight[0] / totalWeight >= tolerantPercentage) {
+    if (DoubleUtil.divide(bucketWeight[0] , totalWeight) >= tolerantPercentage) {
       return true;
-    } else if (bucketWeight[bucketWeight.length - 1] / totalWeight >= tolerantPercentage) {
+    } else if (DoubleUtil.divide(bucketWeight[bucketWeight.length - 1] , totalWeight) >= tolerantPercentage) {
       return true;
     }
     return false;
@@ -45,10 +47,8 @@ public class Histogram {
       throw new IllegalArgumentException("Weight must be non-positive");
     }
     int bucket = options.findBucket(value);
-    bucketWeight[bucket] += weight;
-    bucketWeight[bucket] = round(bucketWeight[bucket]);
-    totalWeight += weight;
-    totalWeight = round(totalWeight);
+    bucketWeight[bucket] = DoubleUtil.add(bucketWeight[bucket],weight);
+    totalWeight = DoubleUtil.add(totalWeight,weight);
     if (bucket < minBucket && bucketWeight[bucket] >= options.getEpsilon()) {
       minBucket = bucket;
     }
@@ -72,7 +72,7 @@ public class Histogram {
   }
 
   private double safeSubtract(double value, double sub, double epsilon) {
-    value -= sub;
+    value = DoubleUtil.subtract(value,sub);
     if (value < epsilon) {
       return 0;
     }
@@ -85,11 +85,9 @@ public class Histogram {
       throw new IllegalArgumentException("Cannot merge histogram with different options");
     }
     for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
-      bucketWeight[bucket] += o.bucketWeight[bucket];
-      bucketWeight[bucket] = round(bucketWeight[bucket]);
+      bucketWeight[bucket] = DoubleUtil.add(bucketWeight[bucket],o.bucketWeight[bucket]);
     }
-    totalWeight += round(o.totalWeight);
-    totalWeight = round(totalWeight);
+    totalWeight = DoubleUtil.add(totalWeight,o.totalWeight);
     if (o.minBucket < minBucket) {
       minBucket = o.minBucket;
     }
@@ -103,11 +101,10 @@ public class Histogram {
       return 0;
     }
     double partialSum = 0;
-    double threshold = round(percentile * totalWeight);
+    double threshold = DoubleUtil.multiply(percentile,totalWeight);
     int bucket = minBucket;
     for (; bucket < maxBucket; bucket++) {
-      partialSum += bucketWeight[bucket];
-      partialSum = round(partialSum);
+      partialSum = DoubleUtil.add(partialSum,bucketWeight[bucket]);
       if (partialSum >= threshold) {
         break;
       }
@@ -133,9 +130,9 @@ public class Histogram {
         startBucket += 1;
       }
       double bucketLeftValue = options.getBucketStart(startBucket);
-      sum += bucketWeight[bucket] * bucketLeftValue;
+      sum = DoubleUtil.multiply(bucketWeight[bucket] ,bucketLeftValue);
     }
-    return round(sum / totalWeight);
+    return DoubleUtil.divide(sum,totalWeight);
   }
 
   public double max() {
@@ -152,12 +149,12 @@ public class Histogram {
     double maxBucketWeight = 0;
     for (int bucket = minBucket; bucket <= maxBucket; bucket++) {
       if (maxBucketWeight == 0) {
-        maxBucketWeight += bucketWeight[bucket];
+        maxBucketWeight = DoubleUtil.add(maxBucketWeight,bucketWeight[bucket]);
       } else if (maxBucketWeight < bucketWeight[bucket]) {
         maxBucketWeight = bucketWeight[bucket];
       }
     }
-    return round(maxBucketWeight);
+    return maxBucketWeight;
   }
 
   public boolean isEmpty() {

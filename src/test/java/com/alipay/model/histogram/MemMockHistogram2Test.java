@@ -9,6 +9,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static com.alipay.consts.HistogramConsts.defaultEpsilon;
 import static com.alipay.consts.HistogramConsts.defaultHistogramBucketSizeGrowth;
@@ -24,8 +26,11 @@ public class MemMockHistogram2Test {
 
     public static final double PERCENTILE = 0.6;
 
+    private Executor executor = Executors.newFixedThreadPool(1);
+
     @Test
     public void testWithMemHistogram() throws Exception {
+        long start = System.currentTimeMillis();
         // exp variable
         String filePath = "showdata2/memmock.csv";
         String outputPath = "showdata2/memmock_mw_12h_2.csv";
@@ -43,7 +48,8 @@ public class MemMockHistogram2Test {
             Long ts = TimestampUtil.stringToTimestampMs(split[0].trim());
             Double value = Double.parseDouble(split[1].trim());
             BaseMetric point = new BaseMetric("mem_used", ts, value/(1024*1024));
-            metricsList.add(point);
+            // multi thread exec
+            executor.execute(() -> metricsList.add(point));
         }, true);
 
         LinkedList<String> outputList = new LinkedList<>();
@@ -62,5 +68,10 @@ public class MemMockHistogram2Test {
             }
         }
         FileUtil.writeFileFromList(outputPath, outputList);
+
+        long end = System.currentTimeMillis();
+        long l = end - start;
+        System.out.println("size: "+ lineNum +",cost:" + l +" ,avg:" + (double)l/lineNum);
+
     }
 }

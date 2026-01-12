@@ -26,7 +26,7 @@ public class CpuMockHistogram2Test {
     public void testWithCpuHistogram() throws Exception {
         // exp variable
         String filePath = "showdata2/cpumock2.csv";
-        String outputPath = "showdata2/cpumock2_mw_4.csv";
+        String outputPath = "showdata2/cpumock2_mw_4_3.csv";
         long millis = Duration.ofMinutes(60).toMillis();
         int sampleWindow = 12;
         HistogramAggType type = HistogramAggType.Percentile;
