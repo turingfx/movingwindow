@@ -37,7 +37,7 @@ public class CpuMockHistogram2Test {
         List<String> cpuValue = Lists.newArrayList();
         FileUtil.readFileWithBufferedReader(cpu, line -> {
             String[] split = line.split(",");
-            Double value = Double.parseDouble(split[1].trim());
+            Double value = Double.parseDouble(split[1].trim())/100;
             cpuValue.add(value.toString());
         }, true);
 
