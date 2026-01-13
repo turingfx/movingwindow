@@ -1,5 +1,6 @@
 package com.alipay.model.histogram;
 
+import com.alipay.model.profiler.MarginAdjust;
 import com.alipay.utils.DoubleUtil;
 
 import static com.alipay.utils.DoubleUtil.round;
@@ -232,4 +233,10 @@ public class Histogram {
         + maxBucket
         + '}';
   }
+
+  public double recommendByHistogram(HistogramAggPolicy policy, MarginAdjust adjust) {
+    //return adjust.applyAdjust(agg(policy));
+    return agg(policy);
+  }
+
 }

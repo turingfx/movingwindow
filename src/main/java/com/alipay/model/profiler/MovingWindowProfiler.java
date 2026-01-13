@@ -1,6 +1,6 @@
 package com.alipay.model.profiler;
 
-import com.alipay.conf.MovingWindowConfig;
+import com.alipay.conf.WMProfilerConfig;
 
 /**
  * @author sansi.xy
@@ -9,6 +9,6 @@ import com.alipay.conf.MovingWindowConfig;
 
 public class MovingWindowProfiler {
 
-    public void queryMetricsAndProfiling(String profileKey, MovingWindowConfig config){
+    public void queryMetricsAndProfiling(String profileKey, WMProfilerConfig config){
     }
 }

@@ -12,4 +12,20 @@ public class HistogramAggPolicy {
     this.type = type;
     this.percentile = percentile;
   }
+
+  public HistogramAggType getType() {
+    return type;
+  }
+
+  public void setType(HistogramAggType type) {
+    this.type = type;
+  }
+
+  public double getPercentile() {
+    return percentile;
+  }
+
+  public void setPercentile(double percentile) {
+    this.percentile = percentile;
+  }
 }
